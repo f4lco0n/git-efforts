@@ -1,0 +1,20 @@
+{% extends 'bokeh.html' %}
+
+{% block content %}
+
+    {% for k,values in repositorys.items %}
+        <br>Autor: {{ k }} Repozytoria: </br>
+        {% for v in values %}
+        {% if website == 'github' %}
+            <br><a href="//github.com/{{ k }}/{{ v }}/">{{ v }}</a>
+
+        {% elif website == 'gitlab' %}
+            <br><a href="//gitlab.com/{{ k }}/{{ v }}">{{ v }}</a>
+
+        {% elif website == 'bitbucket' %}
+            <br><a href="//bitbucket.org/{{ k }}/{{ v }}/src/master/">{{ v }}</a>
+        {% endif %}
+            <!--{{ v }}-->
+        {% endfor %}
+    {% endfor %}
+{% endblock %}

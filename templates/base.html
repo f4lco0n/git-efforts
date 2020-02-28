@@ -1,0 +1,94 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Git Efforts</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+
+	<link href="http://cdn.pydata.org/bokeh/release/bokeh-1.4.0.min.css" rel="stylesheet" type="text/css">
+	<link href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-1.4.0.min.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="{% static 'css/app.css' %}">
+    <script src="http://cdn.pydata.org/bokeh/release/bokeh-1.4.0.min.js"></script>
+	<script src="http://cdn.pydata.org/bokeh/release/bokeh-widgets-1.4.0.min.js"></script>
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.0/css/bootstrap.min.css" integrity="sha384-PDle/QlgIONtM1aqA2Qemk5gPOE7wFq8+Em+G/hmo5Iq0CCmYZLv3fVRDJ4MMwEA" crossorigin="anonymous">
+
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.min.js" integrity="sha384–7aThvCh9TypR7fIc2HV4O/nFMVCBwyIUKL8XCtKE+8xgCgl/PQGuFsvShjr74PBp" crossorigin="anonymous"></script>
+	{{ script | safe }}
+</head>
+<body id="main_body">
+        <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="{% url 'home' %}">Git Efforts</a>
+                </li>
+
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'favorites' %}">Favorites</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                </li>
+
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">Login</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'signup' %}">Signup</a>
+                </li>
+                {% endif %}
+
+            </ul>
+
+
+
+        </nav>
+{{ user.username }}
+
+
+{% block content %}
+
+
+	<div id="form_container">
+        <form method="POST">
+            <ul >
+                <li id="li_1" >
+		            <label class="description" for="id_url">Repository's URL </label>
+		                <div>
+			                <input id="id_url" name="url" class="element text large" type="text" maxlength="255" value=""/>
+		                </div>
+		        </li>
+
+                <li class="buttons">
+                    {% csrf_token %}
+			        <!--<input type="hidden" name="url" id="id_url" />-->
+                    <button type="submit">Submit</button>
+		        </li>
+			</ul>
+		</form>
+        <div class="alert alert-info" role="alert">
+            <center>Valid links for repositorys:
+        </div>
+        <div class="alert alert-success" role="alert">
+            <center><pre>Github:</pre>
+                <pre>https://github.com/USER/PROJECT/commits/master</pre>
+                <pre>Gitlab:</pre>
+                <pre>https://gitlab.com/USER/PROJECT/-/commits/master</pre>
+                <pre>Bitbucket</pre>
+                <pre>https://bitbucket.org/USER/PROJECT/commits/</pre>
+        </div>
+	</div>
+
+
+{% endblock %}
+
+</body>
+</html>

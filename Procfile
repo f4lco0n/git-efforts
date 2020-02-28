@@ -1,0 +1,1 @@
+web: gunicorn praca_inzynierska.wsgi

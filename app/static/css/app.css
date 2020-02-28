@@ -1,0 +1,17 @@
+body {
+    background-color: lightblue;
+}
+
+#sidebar {
+    margin-top: 10px;
+}
+
+
+#categories {
+    margin-top: 10px;
+}
+
+#main {
+    margin-top: -365px;
+    margin-left: 300px;
+}
