@@ -1,1 +1,1 @@
-web: gunicorn praca_inzynierska.wsgi
+web: gunicorn praca_inzynierska.wsgi --log-file -
