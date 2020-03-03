@@ -62,7 +62,7 @@ class CalculationLogic:
             data['color'] = Category20c[len(slownik_procenty)]
 
         plot_pie = figure(plot_height=500,plot_width=1000, title='Pie chart', toolbar_location=None, tools='hover', x_range=(-0.5, 1.0))
-        plot_pie.wedge(x=0, y=1, radius=0.4,
+        plot_pie.wedge(x=0, y=1, radius=0.35,
                        start_angle=cumsum('angle', include_zero=True), end_angle=cumsum('angle'),
                        line_color="white", fill_color='color', legend_field='country', source=data)
 
