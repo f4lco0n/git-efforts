@@ -53,10 +53,7 @@
         </nav>
 {{ user.username }}
 
-
 {% block content %}
-
-
 	<div id="form_container">
         <form method="POST">
             <ul >
@@ -69,13 +66,20 @@
 
                 <li class="buttons">
                     {% csrf_token %}
-			        <!--<input type="hidden" name="url" id="id_url" />-->
-                    <button type="submit">Submit</button>
+                    <center><button type="submit" class="btn btn-dark">Check stats</button></center>
+                    <!--<button type="submit">Submit</button>-->
 		        </li>
 			</ul>
 		</form>
+        {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        <center>{{ message }}</center>
+                    </div>
+                {% endfor %}
+            {% endif %}
         <div class="alert alert-info" role="alert">
-            <center>Valid links for repositorys:
+            <center>Valid links for repositorys:</center>
         </div>
         <div class="alert alert-success" role="alert">
             <center><pre>Github:</pre>
@@ -83,11 +87,9 @@
                 <pre>Gitlab:</pre>
                 <pre>https://gitlab.com/USER/PROJECT/-/commits/master</pre>
                 <pre>Bitbucket</pre>
-                <pre>https://bitbucket.org/USER/PROJECT/commits/</pre>
+                <pre>https://bitbucket.org/USER/PROJECT/commits/</pre></center>
         </div>
 	</div>
-
-
 {% endblock %}
 
 </body>

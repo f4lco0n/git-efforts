@@ -83,12 +83,14 @@
                 <div class="col-lg" id="main">
                     {% block content %}
 						{{ div | safe }}
+                    {% if user.is_authenticated %}
                     <form method="POST">
                         {% csrf_token %}
                         <!--<a href="{% url 'favorites' %}">Click</a>-->
-                        <button type="submit">Dodaj do ulubionych</button>
+                        <button class="btn btn-primary" type="submit">Add to favorites</button>
+                        <!--<button type="submit">Dodaj do ulubionych</button>-->
                     </form>
-
+                    {% endif %}
                     {% endblock %}
 
         </div>

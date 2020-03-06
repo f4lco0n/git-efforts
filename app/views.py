@@ -5,15 +5,18 @@ from django.shortcuts import render, redirect
 from .models import Repository
 from django.db import IntegrityError
 from django.contrib.auth.models import User
+from django.contrib import messages
 import bs4 as bs
 from .modules.calculation_logic import CalculationLogic
 
 def home(request):
     if request.method == 'POST':
-        url = request.POST['url']
-        request.session['url'] = url
-        return redirect('bokeh')
-
+        if request.POST['url']:
+            url = request.POST['url']
+            request.session['url'] = url
+            return redirect('bokeh')
+        else:
+            messages.error(request, 'Insert URL')
     return render(request,'base.html')
 
 def favorites(request):
