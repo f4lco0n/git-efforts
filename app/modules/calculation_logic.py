@@ -12,6 +12,7 @@ from bokeh.palettes import Category20c
 from bokeh.transform import cumsum
 from collections import Counter
 from django.http import HttpResponse, Http404
+from django.contrib import messages
 from django.shortcuts import render, redirect
 from datetime import datetime
 import calendar
@@ -22,53 +23,59 @@ class CalculationLogic:
         pass
 
     def get_data_from_url(self,request,url):
-        source = urllib.request.urlopen(url).read()
-        soup = bs.BeautifulSoup(source,'lxml')
-        if 'github' in url:
-            descrp = [description.text for description in soup.find_all('p', class_="commit-title")]
-            author = [author.text for author in soup.find_all('a', class_="commit-author")]
-        elif 'gitlab' in url:
-            descrp = [description.text for description in
+        try:
+            source = urllib.request.urlopen(url).read()
+            soup = bs.BeautifulSoup(source,'lxml')
+            if 'github' in url:
+                descrp = [description.text for description in soup.find_all('p', class_="commit-title")]
+                author = [author.text for author in soup.find_all('a', class_="commit-author")]
+            elif 'gitlab' in url:
+                descrp = [description.text for description in
                       soup.find_all('a', class_="commit-row-message item-title js-onboarding-commit-item")]
-            author = [author.text for author in soup.find_all('a', class_="commit-author-link js-user-link")]
-        elif 'bitbucket' in url:
-            descrp = self.get_bitbucket_description(url)
-            author = self.get_bitbucket_author(url)
+                author = [author.text for author in soup.find_all('a', class_="commit-author-link js-user-link")]
+            elif 'bitbucket' in url:
+                descrp = self.get_bitbucket_description(url)
+                author = self.get_bitbucket_author(url)
 
+            dict1 = dict(zip(descrp, author))
+            dict2 = dict(Counter(dict1.values()))
+            label = list(dict2.keys())
+            value = list(dict2.values())
+            etykiety = list(dict2.keys())
+            wartosci = list(dict2.values())
 
-        dict1 = dict(zip(descrp, author))
-        dict2 = dict(Counter(dict1.values()))
-        label = list(dict2.keys())
-        value = list(dict2.values())
-        etykiety = list(dict2.keys())
-        wartosci = list(dict2.values())
+            procenty = []
+            for w in wartosci:
+                procenty.append(w * 100 / sum(wartosci))
+            slownik_procenty = dict(zip(etykiety, procenty))
 
-        procenty = []
-        for w in wartosci:
-            procenty.append(w * 100 / sum(wartosci))
-        slownik_procenty = dict(zip(etykiety, procenty))
+            plot = figure(title='Github Effort', x_range=label, y_range=(0, 30), plot_width=1000, plot_height=400)
 
-        plot = figure(title='Github Effort', x_range=label, y_range=(0, 30), plot_width=1000, plot_height=400)
+            plot.vbar(x=label,top=value,width=0.9)
+            data = pd.Series(slownik_procenty).reset_index(name='value').rename(columns={'index': 'country'})
+            data['angle'] = data['value'] / data['value'].sum() * 2 * pi
 
-        plot.vbar(x=label,top=value,width=0.9)
-        data = pd.Series(slownik_procenty).reset_index(name='value').rename(columns={'index': 'country'})
-        data['angle'] = data['value'] / data['value'].sum() * 2 * pi
+            if len(slownik_procenty) == 1:
+                data['color'] = '#44e5e2'
+            elif len(slownik_procenty) == 2:
+                data['color'] = ['#44e5e2','#2d4a49']
+            else:
+                data['color'] = Category20c[len(slownik_procenty)]
 
-        if len(slownik_procenty) == 1:
-            data['color'] = '#44e5e2'
-        elif len(slownik_procenty) == 2:
-            data['color'] = ['#44e5e2','#2d4a49']
-        else:
-            data['color'] = Category20c[len(slownik_procenty)]
-
-        plot_pie = figure(plot_height=500,plot_width=1000, title='Pie chart', toolbar_location=None, tools='hover', x_range=(-0.5, 1.0))
-        plot_pie.wedge(x=0, y=1, radius=0.35,
+            plot_pie = figure(plot_height=500,plot_width=1000, title='Pie chart', toolbar_location=None, tools='hover', x_range=(-0.5, 1.0))
+            plot_pie.wedge(x=0, y=1, radius=0.35,
                        start_angle=cumsum('angle', include_zero=True), end_angle=cumsum('angle'),
                        line_color="white", fill_color='color', legend_field='country', source=data)
 
-        script, div = components(column(plot, plot_pie))
+            script, div = components(column(plot, plot_pie))
 
-        return render(request, 'bokeh.html', {'script': script, 'div': div,"url":url})
+            return render(request, 'bokeh.html', {'script': script, 'div': div,"url":url})
+
+        except:
+            messages.error(request,'URL not found')
+
+
+        return redirect('home')
 
 
     def show_days_of_the_week(self,request,url):
