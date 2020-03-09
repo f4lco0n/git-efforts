@@ -9,6 +9,7 @@ from bokeh.embed import components
 from bokeh.io import show,output_file
 from bokeh.layouts import gridplot,row,column
 from bokeh.palettes import Category20c
+from bokeh.models import LabelSet, ColumnDataSource
 from bokeh.transform import cumsum
 from collections import Counter
 from django.http import HttpResponse, Http404
@@ -21,6 +22,7 @@ class CalculationLogic:
 
     def __init__(self):
         pass
+
 
     def get_data_from_url(self,request,url):
         try:
@@ -52,21 +54,29 @@ class CalculationLogic:
             plot = figure(title='Github Effort', x_range=label, y_range=(0, 30), plot_width=1000, plot_height=400)
 
             plot.vbar(x=label,top=value,width=0.9)
-            data = pd.Series(slownik_procenty).reset_index(name='value').rename(columns={'index': 'country'})
+
+            data = pd.Series(dict2).reset_index(name='value').rename(columns={'index': 'country'})
             data['angle'] = data['value'] / data['value'].sum() * 2 * pi
 
-            if len(slownik_procenty) == 1:
+            if len(dict2) == 1:
                 data['color'] = '#44e5e2'
-            elif len(slownik_procenty) == 2:
+            elif len(dict2) == 2:
                 data['color'] = ['#44e5e2','#2d4a49']
             else:
                 data['color'] = Category20c[len(slownik_procenty)]
 
-            plot_pie = figure(plot_height=500,plot_width=1000, title='Pie chart', toolbar_location=None, tools='hover', x_range=(-0.5, 1.0))
+            plot_pie = figure(plot_height=500,plot_width=1000, title='Pie chart', toolbar_location=None,x_range=(-0.5, 1.0))
             plot_pie.wedge(x=0, y=1, radius=0.35,
                        start_angle=cumsum('angle', include_zero=True), end_angle=cumsum('angle'),
                        line_color="white", fill_color='color', legend_field='country', source=data)
 
+            data['value'] = data['value'].astype(str)
+            data['value'] = data['value'].str.pad(35, side='left')
+            source = ColumnDataSource(data)
+
+            labels = LabelSet(x=0, y=1, text='value', angle=cumsum('angle', include_zero=True),
+                              source=source, render_mode='canvas')
+            plot_pie.add_layout(labels)
             script, div = components(column(plot, plot_pie))
 
             return render(request, 'bokeh.html', {'script': script, 'div': div,"url":url})

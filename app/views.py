@@ -26,6 +26,7 @@ def favorites(request):
     return render(request, 'favorites.html', {'url': url, 'repos': repos})
 
 
+
 def add_url_to_database(request):
     try:
         url = request.session.get('url')
