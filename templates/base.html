@@ -51,11 +51,13 @@
 
             </ul>
 
-
+            {% if user.is_authenticated %}
+            <div class="loged_user">
+                You are logged as: {{ user.username }}
+            </div>
+            {% endif %}
 
         </nav>
-{{ user.username }}
-
 {% block content %}
 	<div id="form_container">
         <form method="POST">

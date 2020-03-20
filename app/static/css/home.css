@@ -73,6 +73,13 @@ input.large
 	width:99%;
 }
 
+.description {
+    text-align: center;
+}
+
+.loged_user {
+    color: white;
+}
 
 
 

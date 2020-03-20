@@ -35,7 +35,11 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'show_user_repo' %}">Users repo</a>
                 </li>
-
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'favorites' %}">Favorites</a>
+                </li>
+                {% endif %}
             </ul>
 
 
@@ -45,14 +49,13 @@
                 <!-- Side Bar -->
                 <div class="col-sm-2">
                     <div class="card my-4 bg-dark text-white" id="sidebar">
-                        <h5 class="card-header">About</h5>
+                        <h5 class="card-header">Personal Information</h5>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-lg-6">
                                     <ul class="list-unstyled mb-0">
                                         <li>
-                                            <a href="#">News </a>
-                                            <a href="#">Social</a>
+                                            <a href="#"> About me </a>
                                             <a href="#">Contact</a>
                                         </li>
                                     </ul>
@@ -86,9 +89,7 @@
                     {% if user.is_authenticated %}
                     <form method="POST">
                         {% csrf_token %}
-                        <!--<a href="{% url 'favorites' %}">Click</a>-->
                         <button class="btn btn-primary" type="submit">Add to favorites</button>
-                        <!--<button type="submit">Dodaj do ulubionych</button>-->
                     </form>
                     {% endif %}
                     {% endblock %}
