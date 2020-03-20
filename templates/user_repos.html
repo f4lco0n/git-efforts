@@ -3,20 +3,27 @@
 {% block content %}
 
     {% for k,values in repositorys.items %}
-    <div class="d-inline p-2 bg-primary text-white">Autor: {{ k }} Repozytoria: </div>
+    <table class="table table-dark">
+        <thead>
+           <tr><th>Autor: {{ k }}</th> </tr>
+        </thead>
+        <tbody>
         {% for v in values %}
-        {% if website == 'github' %}
-        <span class="d-block p-2 bg-dark text-white">
-            <a href="//github.com/{{ k }}/{{ v }}/">{{ v }}</a>
-        </span>
+        <tr>
+            <th>
+            {% if website == 'github' %}
+                <a href="//github.com/{{ k }}/{{ v }}/">{{ v }}</a>
+            {% elif website == 'gitlab' %}
+                <a href="//gitlab.com/{{ k }}/{{ v }}">{{ v }}</a>
+            {% elif website == 'bitbucket' %}
+                <a href="//bitbucket.org/{{ k }}/{{ v }}/src/master/">{{ v }}</a>
+            {% endif %}
+            </th>
 
-        {% elif website == 'gitlab' %}
-            <br><a href="//gitlab.com/{{ k }}/{{ v }}">{{ v }}</a>
-
-        {% elif website == 'bitbucket' %}
-            <br><a href="//bitbucket.org/{{ k }}/{{ v }}/src/master/">{{ v }}</a>
-        {% endif %}
-            <!--{{ v }}-->
+        </tr>
         {% endfor %}
+        </tbody>
+
+    </table>
     {% endfor %}
 {% endblock %}
