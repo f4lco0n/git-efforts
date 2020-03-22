@@ -30,6 +30,9 @@ urlpatterns = [
     url(r'^bokeh/',views.bokeh,name='bokeh'),
     url(r'^days/',views.days,name='days'),
     url(r'^favorites/',views.favorites,name='favorites'),
+    url(r'^about/',views.about,name='about'),
+
+
 
     url('admin/', admin.site.urls),
 ]

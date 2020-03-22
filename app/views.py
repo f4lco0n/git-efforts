@@ -19,6 +19,9 @@ def home(request):
             messages.error(request, 'Insert URL')
     return render(request,'base.html')
 
+def about(request):
+    return render(request,'about.html')
+
 def favorites(request):
     url = request.session.get('url')
     user = User.objects.get(username=request.user.username)
