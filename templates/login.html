@@ -7,7 +7,8 @@
             <div class="row">
                 <div class="col-md-6 login-form-1">
                     <h3>Login</h3>
-                    <form method="POST">
+                    <form method="POST" action="{% url 'login' %}">
+                        <input type="hidden" name="next" value="{{ next }}">
                         {% csrf_token %}
                         <div class="form-group">
                             <input type="text" class="form-control" placeholder="Enter Username" name="username" required>
