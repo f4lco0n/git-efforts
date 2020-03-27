@@ -31,8 +31,7 @@ urlpatterns = [
     url(r'^days/',views.days,name='days'),
     url(r'^favorites/',views.favorites,name='favorites'),
     url(r'^about/',views.about,name='about'),
-
-
+    url(r'^about_app/', views.about_app, name='about_app'),
 
     url('admin/', admin.site.urls),
 ]

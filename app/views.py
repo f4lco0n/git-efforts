@@ -22,6 +22,9 @@ def home(request):
 def about(request):
     return render(request,'about.html')
 
+def about_app(request):
+    return render(request,'about_app.html')
+
 def favorites(request):
     url = request.session.get('url')
     user = User.objects.get(username=request.user.username)
