@@ -12,9 +12,10 @@ body {
 }
 
 #main {
-    margin-top: -365px;
-    margin-left: 300px;
-    width: 80%
+    margin-align: left;
+    margin-top: 25px;
+    margin-left: 3%;
+    width: 75%;
 }
 
 h1 {

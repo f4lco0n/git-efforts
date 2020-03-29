@@ -1,11 +1,9 @@
 {% extends 'bokeh.html' %}
 
 {% block content %}
+<h1>Favorites repositorys for: {{ user }}</h1>
+    <table class="table table-dark" style="width: 800px">
 
-    <table class="table table-dark" style="width: 1000px">
-        <thead>
-           <tr><th>Favorites repositorys for: {{ user }}</th> </tr>
-        </thead>
 
         <tbody>
         {% for r in repos %}

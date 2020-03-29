@@ -16,9 +16,7 @@
 
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.min.js" integrity="sha384–7aThvCh9TypR7fIc2HV4O/nFMVCBwyIUKL8XCtKE+8xgCgl/PQGuFsvShjr74PBp" crossorigin="anonymous"></script>
         {{ script | safe }}
-    </head>
-<body>
-        <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+                <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
                     <a class="nav-link" href="{% url 'home' %}">Git Efforts</a>
@@ -52,6 +50,9 @@
 
 
         </nav>
+    </head>
+<body>
+
         <div class="container-fluid">
             <div class="row">
                 <!-- Side Bar -->
@@ -87,7 +88,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
                                     <!-- Main Content -->
                 <div class="col-lg" id="main">
@@ -102,6 +102,7 @@
                     {% endblock %}
 
         </div>
+            </div>
 </div>
 </body>
 </html>
