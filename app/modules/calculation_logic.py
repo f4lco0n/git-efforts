@@ -129,7 +129,7 @@ class CalculationLogic:
             for url in user_repo_url:
                 source = urllib.request.urlopen(url).read()
                 soup = bs.BeautifulSoup(source, 'lxml')
-                repos = [repo.get_text(strip=True) for repo in soup.find_all('div', class_='d-inline-block mb-1')]
+                repos = [repo.get_text(strip=True) for repo in soup.find_all('h3', class_='wb-break-all')]
                 repositorys[a] = repos
         return repositorys
 
