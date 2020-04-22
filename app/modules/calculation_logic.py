@@ -1,21 +1,20 @@
 from math import pi
 import urllib.request
-import requests
 import json
+from collections import Counter
+from datetime import datetime
+import calendar
+import requests
 import bs4 as bs
 import pandas as pd
-from bokeh.plotting import figure, output_file, show
+from bokeh.plotting import figure
 from bokeh.embed import components
-from bokeh.layouts import gridplot, row, column
+from bokeh.layouts import column
 from bokeh.palettes import Category20c
 from bokeh.models import LabelSet, ColumnDataSource
 from bokeh.transform import cumsum
-from collections import Counter
-from django.http import HttpResponse, Http404
 from django.contrib import messages
 from django.shortcuts import render, redirect
-from datetime import datetime
-import calendar
 
 
 class CalculationLogic:
@@ -56,6 +55,7 @@ class CalculationLogic:
             dict2_keys = list(dict2.keys())
             values = list(dict2.values())
 
+
             percentages = []
             for val in values:
                 percentages.append(val * 100 / sum(values))
@@ -66,7 +66,7 @@ class CalculationLogic:
 
             plot.vbar(x=label, top=value, width=0.9)
 
-            data = pd.Series(dict2).reset_index(name='value').rename(columns={'index': 'country'})
+            data = pd.Series(dict2).reset_index(name='value')
             data['angle'] = data['value'] / data['value'].sum() * 2 * pi
 
             if len(dict2) == 1:
@@ -83,7 +83,7 @@ class CalculationLogic:
                            end_angle=cumsum('angle'),
                            line_color="white",
                            fill_color='color',
-                           legend_field='country',
+                           legend_field='index',
                            source=data)
 
             data['value'] = data['value'].astype(str)
@@ -137,14 +137,14 @@ class CalculationLogic:
         author_list = list(set(author))
         user_repo_url = []
         repositorys = dict()
-        for author in author_list:
-            user_repo_url.append('https://github.com/{}/?tab=repositories'.format(author))
+        for authors in author_list:
+            user_repo_url.append('https://github.com/{}/?tab=repositories'.format(authors))
             for url in user_repo_url:
                 source = urllib.request.urlopen(url).read()
                 soup = bs.BeautifulSoup(source, 'lxml')
                 repos = [repo.get_text(strip=True) for repo in soup
                          .find_all('h3', class_='wb-break-all')]
-                repositorys[author] = repos
+                repositorys[authors] = repos
         return repositorys
 
     @staticmethod
@@ -153,15 +153,15 @@ class CalculationLogic:
         author_list = list(set(author))
         user_repo_url = []
         repositorys = dict()
-        for a in author_list:
-            user_repo_url.append('https://gitlab.com/users/{}/projects.json'.format(a))
+        for authors in author_list:
+            user_repo_url.append('https://gitlab.com/users/{}/projects.json'.format(authors))
             for url in user_repo_url:
                 print(url)
                 source = urllib.request.urlopen(url).read()
                 soup = bs.BeautifulSoup(json.loads(source)['html'], 'lxml')
                 repos = [repo.get_text(strip=True) for repo in soup
                          .find_all('span', class_='project-name')]
-                repositorys[a] = repos
+                repositorys[authors] = repos
         return repositorys
 
     @staticmethod
@@ -172,19 +172,19 @@ class CalculationLogic:
         repositorys = dict()
         repos = []
         clean_repos = []
-        for a in author_list:
+        for authors in author_list:
             user_repo_url.append(
                 'https://bitbucket.org/!api/2.0/repositories/{}'
                 '?page=1&pagelen=25&sort=-updated_on&q='
-                .format(a))
+                .format(authors))
             for url in user_repo_url:
-                r = requests.get(url).json()
-                for i in range(0, len(r['values'])):
-                    repos.append(repos.append(r['values'][i]['name']))
-            for v in repos:
-                if v != None:
-                    clean_repos.append(v)
-            repositorys[a] = clean_repos
+                req = requests.get(url).json()
+                for i in range(0, len(req['values'])):
+                    repos.append(repos.append(req['values'][i]['name']))
+            for value in repos:
+                if value is not None:
+                    clean_repos.append(value)
+            repositorys[authors] = clean_repos
         return repositorys
 
     def show_user_repo(self, request, url):
@@ -209,55 +209,61 @@ class CalculationLogic:
                         + fixed_url + \
                         '/changesets?fields=%2B%2A.participants.approved%2C-%2A' \
                         '.participants.%2A&page=1&pagelen=25'
-            r = requests.get(valid_url).json()
+            req = requests.get(valid_url).json()
             author = []
-            for i in range(0, len(r['values'])):
-                author.append(r['values'][i]['author']['user']['nickname'])
+            for i in range(0, len(req['values'])):
+                author.append(req['values'][i]['author']['user']['nickname'])
             repositorys = self.extract_bitbucket_repository(author)
 
         return render(request, 'user_repos.html', {'repositorys': repositorys, 'website': website})
 
-    def get_bitbucket_description(self, url):
+    @staticmethod
+    def get_bitbucket_description(url):
         """additional method to get description from BitBucket API instead of WebScraping"""
         fixed_url = url.strip('https://bitbucket.org/commits')
         valid_url = 'https://bitbucket.org/!api/internal/repositories/'\
                     + fixed_url + \
                     '/changesets?fields=%2B%2A.participants.approved%2C-%2A' \
                     '.participants.%2A&page=1&pagelen=25'
-        r = requests.get(valid_url).json()
+        print(valid_url)
+        req = requests.get(valid_url).json()
         data = []
-        for i in range(0, len(r['values'])):
-            data.append(r['values'][i]['message'])
+        for i in range(0, len(req['values'])):
+            data.append(req['values'][i]['message'].strip('\n'))
+
+        print('DANE Z GET BITBUCKET DESCRIPTION: ', data)
         return data
 
-    def get_bitbucket_author(self, url):
+    @staticmethod
+    def get_bitbucket_author(url):
         """additional method to get author from BitBucket API instead of WebScraping"""
         fixed_url = url.strip('https://bitbucket.org/commits')
         valid_url = 'https://bitbucket.org/!api/internal/repositories/'\
                     + fixed_url + \
                     '/changesets?fields=%2B%2A.participants.approved%2C-%2A' \
                     '.participants.%2A&page=1&pagelen=25'
-        r = requests.get(valid_url).json()
+        req = requests.get(valid_url).json()
         data = []
-        for i in range(0, len(r['values'])):
-            data.append(r['values'][i]['author']['raw'])
+        for i in range(0, len(req['values'])):
+            data.append(req['values'][i]['author']['raw'])
         return data
 
-    def get_bitbucket_date(self, url):
+    @staticmethod
+    def get_bitbucket_date(url):
         """additional method to get date from BitBucket API instead of WebScraping"""
         fixed_url = url.strip('https://bitbucket.org/commits')
         valid_url = 'https://bitbucket.org/!api/internal/repositories/' \
                     + fixed_url + \
                     '/changesets?fields=%2B%2A.participants.approved%2C-%2A' \
                     '.participants.%2A&page=1&pagelen=25'
-        r = requests.get(valid_url).json()
+        req = requests.get(valid_url).json()
         data = []
-        for i in range(0, len(r['values'])):
-            data.append(r['values'][i]['date'])
+        for i in range(0, len(req['values'])):
+            data.append(req['values'][i]['date'])
         clean_data = []
-        for d in data:
-            clean_data.append(d[0:10])
+        for date in data:
+            clean_data.append(date[0:10])
         days_of_the_week = []
-        for c in clean_data:
-            days_of_the_week.append(datetime.strptime(c, "%Y-%m-%d").strftime("%A"))
+        for date in clean_data:
+            days_of_the_week.append(datetime.strptime(date, "%Y-%m-%d").strftime("%A"))
         return days_of_the_week
