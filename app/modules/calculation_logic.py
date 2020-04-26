@@ -17,6 +17,12 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 
 
+class Commit(object):
+
+    def __init__(self, commit_name):
+        self.commit_name = commit_name
+
+
 class CalculationLogic:
     """class to manage data from Git Servers"""
 
@@ -29,14 +35,14 @@ class CalculationLogic:
             source = urllib.request.urlopen(url).read()
             soup = bs.BeautifulSoup(source, 'lxml')
             if 'github' in url:
-                descrp = [description.text for description in soup
+                descrp = [Commit(description.text) for description in soup
                           .find_all('p', class_="commit-title")]
 
                 author = [author.text for author in soup
                           .find_all('a', class_="commit-author")]
 
             elif 'gitlab' in url:
-                descrp = [description.text for description in soup
+                descrp = [Commit(description.text) for description in soup
                           .find_all('a',
                                     class_="commit-row-message item-title js-onboarding-commit-item"
                                     )]
@@ -47,6 +53,8 @@ class CalculationLogic:
             elif 'bitbucket' in url:
                 descrp = self.get_bitbucket_description(url)
                 author = self.get_bitbucket_author(url)
+
+
 
             dict1 = dict(zip(descrp, author))
             dict2 = dict(Counter(dict1.values()))
@@ -116,7 +124,9 @@ class CalculationLogic:
 
         elif 'gitlab' in url:
             days = [date.text for date in soup.find_all('span', class_='day')]
+            print('DAYS GITLAB:', days)
             commits = [commit.text for commit in soup.find_all('span', class_='commits-count')]
+            print('COMMITS GITLAB: ',commits)
             clean_commits = [commit.strip('commits') for commit in commits]
 
             total = dict(zip(days, clean_commits))
@@ -156,7 +166,6 @@ class CalculationLogic:
         for authors in author_list:
             user_repo_url.append('https://gitlab.com/users/{}/projects.json'.format(authors))
             for url in user_repo_url:
-                print(url)
                 source = urllib.request.urlopen(url).read()
                 soup = bs.BeautifulSoup(json.loads(source)['html'], 'lxml')
                 repos = [repo.get_text(strip=True) for repo in soup
@@ -225,13 +234,11 @@ class CalculationLogic:
                     + fixed_url + \
                     '/changesets?fields=%2B%2A.participants.approved%2C-%2A' \
                     '.participants.%2A&page=1&pagelen=25'
-        print(valid_url)
         req = requests.get(valid_url).json()
         data = []
         for i in range(0, len(req['values'])):
-            data.append(req['values'][i]['message'].strip('\n'))
+            data.append(Commit(req['values'][i]['message'].strip('\n')))
 
-        print('DANE Z GET BITBUCKET DESCRIPTION: ', data)
         return data
 
     @staticmethod
