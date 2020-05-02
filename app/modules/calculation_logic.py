@@ -1,5 +1,6 @@
 from math import pi
 import urllib.request
+from urllib.error import HTTPError
 import json
 from collections import Counter
 from datetime import datetime
@@ -105,7 +106,7 @@ class CalculationLogic:
 
             return render(request, 'bokeh.html', {'script': script, 'div': div, "url": url})
 
-        except ValueError:
+        except HTTPError:
             messages.error(request, 'URL not found')
 
         return redirect('home')
@@ -124,9 +125,7 @@ class CalculationLogic:
 
         elif 'gitlab' in url:
             days = [date.text for date in soup.find_all('span', class_='day')]
-            print('DAYS GITLAB:', days)
             commits = [commit.text for commit in soup.find_all('span', class_='commits-count')]
-            print('COMMITS GITLAB: ',commits)
             clean_commits = [commit.strip('commits') for commit in commits]
 
             total = dict(zip(days, clean_commits))
