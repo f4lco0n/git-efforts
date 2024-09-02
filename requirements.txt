@@ -8,7 +8,7 @@ Django==3.2.18
 django-crispy-forms==1.7.2
 django-heroku==0.3.1
 django-widget-tweaks==1.4.5
-gunicorn==20.0.4
+gunicorn==21.2.0
 idna==2.9
 Jinja2==2.10.3
 lxml==4.4.1
